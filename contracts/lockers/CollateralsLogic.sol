@@ -103,19 +103,9 @@ contract CollateralsLogic is ICollaterals, Ownable2StepUpgradeable, UUPSUpgradea
     ) external view override {
         uint minLockedAmount = getMinLockedAmount(_token);
 
-        require(
-            _lockedAmount >= minLockedAmount,
-            string(
-                abi.encodePacked(
-                    "Lockers: low collateral, lockedToken ",
-                    Strings.toHexString(_token),
-                    ", lockedAmount ",
-                    Strings.toHexString(_lockedAmount),
-                    ", minLockedAmount ",
-                    Strings.toHexString(minLockedAmount)
-                )
-            )
-        );
+        if (_lockedAmount < minLockedAmount) {
+            revert InsufficientCollateral(_token, _lockedAmount, minLockedAmount);
+        }
     }
 
     /// @notice                     Sets address of lockers contract

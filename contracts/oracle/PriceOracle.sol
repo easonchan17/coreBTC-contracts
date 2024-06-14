@@ -239,35 +239,13 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
         uint outputAmount = (uint(price0.price * exchangeRate0) * 10**(price1.decimals + exchangeRateDecimals1))*_inputAmount*(10**(_outputDecimals + 1));
         outputAmount = outputAmount/((10**(_inputDecimals + 1))*(uint(price1.price * exchangeRate1) * 10**(price0.decimals + exchangeRateDecimals0)));
 
-        require(
-            _abs(block.timestamp.toInt256() - price0.publishTime.toInt256()) <= acceptableDelay,
-            string(
-                abi.encodePacked(
-                    "PriceOracle: price is expired",
-                    ", token ",
-                    Strings.toHexString(_inputToken),
-                    ", publishTime ",
-                    Strings.toHexString(price0.publishTime),
-                    ", diffTime ",
-                    Strings.toHexString(_abs(block.timestamp.toInt256() - price0.publishTime.toInt256()))
-                )
-            )
-        );
+        if (_abs(block.timestamp.toInt256() - price0.publishTime.toInt256()) > acceptableDelay) {
+            revert ExpiredPrice(_inputToken, price0.publishTime, block.timestamp);
+        }
 
-        require(
-            _abs(block.timestamp.toInt256() - price1.publishTime.toInt256()) <= acceptableDelay,
-            string(
-                abi.encodePacked(
-                    "PriceOracle: price is expired",
-                    ", token ",
-                    Strings.toHexString(_outputToken),
-                    ", publishTime ",
-                    Strings.toHexString(price1.publishTime),
-                    ", diffTime ",
-                    Strings.toHexString(_abs(block.timestamp.toInt256() - price1.publishTime.toInt256()))
-                )
-            )
-        );
+        if (_abs(block.timestamp.toInt256() - price1.publishTime.toInt256()) > acceptableDelay) {
+            revert ExpiredPrice(_outputToken, price1.publishTime, block.timestamp);
+        }
 
         // choose earlier publishTime
         return (true, outputAmount, Math.min(price0.publishTime, price1.publishTime));
@@ -333,19 +311,7 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
             }
         }
 
-        require(
-            false,
-            string(
-                abi.encodePacked(
-                    "PriceOracle: pairName0 ",
-                    _pairName0,
-                    ", pairName1 ",
-                    _pairName1,
-                    ",  ",
-                    err
-                )
-            )
-        );
+        revert FailedQueryPrice(_pairName0, _pairName1, err);
     }
 
     function _getEarnExchangeRateAndAnchorToken(address _token) internal view returns (uint exchangeRate, uint decimals, address anchorToken) {
@@ -364,19 +330,9 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
         decimals = EARN_EXCHANGE_RATE_DECIMALS;
         anchorToken = NATIVE_TOKEN;
 
-        require(
-            exchangeRate >= 10**decimals,
-            string(
-                abi.encodePacked(
-                    "PriceOracle: token ",
-                    Strings.toHexString(_token),
-                    ", earn rate ",
-                    Strings.toHexString(exchangeRate),
-                    ", earn decimals ",
-                    Strings.toHexString(decimals)
-                )
-            )
-        );
+        if (exchangeRate < 10**decimals) {
+            revert InvalidExchangeRate(_token, anchorToken, exchangeRate, decimals);
+        }
     }
 
     /// @notice             Returns absolute value
