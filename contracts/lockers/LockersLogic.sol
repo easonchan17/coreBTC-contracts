@@ -166,21 +166,21 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /// @notice                 Changes the price oracle
     /// @dev                    Only current owner can call this
     /// @param _priceOracle     The new price oracle
-    function setPriceOracle(address _priceOracle) external override nonZeroAddress(_priceOracle) onlyOwner {
+    function setPriceOracle(address _priceOracle) external override onlyOwner {
         _setPriceOracle(_priceOracle);
     }
 
     /// @notice                Changes cc burn router contract
     /// @dev                   Only current owner can call this
     /// @param _ccBurnRouter   The new cc burn router contract address
-    function setCCBurnRouter(address _ccBurnRouter) external override nonZeroAddress(_ccBurnRouter) onlyOwner {
+    function setCCBurnRouter(address _ccBurnRouter) external override onlyOwner {
         _setCCBurnRouter(_ccBurnRouter);
     }
 
     /// @notice                 Changes wrapped token contract address
     /// @dev                    Only owner can call this
     /// @param _coreBTC         The new wrapped token contract address
-    function setCoreBTC(address _coreBTC) external override nonZeroAddress(_coreBTC) onlyOwner {
+    function setCoreBTC(address _coreBTC) external override onlyOwner {
         _setCoreBTC(_coreBTC);
     }
 

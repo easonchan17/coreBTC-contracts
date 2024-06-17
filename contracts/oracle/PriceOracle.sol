@@ -25,11 +25,6 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
         _;
     }
 
-    modifier notSameString(string memory str1, string memory str2) {
-        require(!Strings.equal(str1, str2), "PriceOracle: two strings are the same");
-        _;
-    }
-
     address public constant NATIVE_TOKEN = address(1);
     uint public constant EARN_EXCHANGE_RATE_DECIMALS = 6;
 
