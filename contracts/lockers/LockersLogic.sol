@@ -932,7 +932,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     function _setPriceWithDiscountRatio(uint _priceWithDiscountRatio) private {
         require(
             _priceWithDiscountRatio <= ONE_HUNDRED_PERCENT,
-            "Lockers: less than 100%"
+            "Lockers: less than or equal to 100%"
         );
         emit NewPriceWithDiscountRatio(priceWithDiscountRatio, _priceWithDiscountRatio);
 
@@ -992,6 +992,11 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /// @notice                         Internal setter for slash compensation ratio
     /// @param _slashCompensationRatio  The new slash compensation ratio
     function _setSlashCompensationRatio(uint _slashCompensationRatio) private {
+        require(
+            _slashCompensationRatio <= ONE_HUNDRED_PERCENT,
+            "Lockers: less than or equal to 100%"
+        );
+
         emit NewSlashCompensationRatio(slashCompensationRatio, _slashCompensationRatio);
         slashCompensationRatio = _slashCompensationRatio;
         libParams.slashCompensationRatio = slashCompensationRatio;
