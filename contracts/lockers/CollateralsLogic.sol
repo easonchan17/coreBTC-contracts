@@ -37,17 +37,17 @@ contract CollateralsLogic is ICollaterals, Ownable2StepUpgradeable, UUPSUpgradea
 
     /// @notice                             Gives default params to initiate collaterals
     /// @param _lockers                     Address of lockers contract
-    /// @param _minRequiredTNTLockedAmount  Minimum required locked amount of native token
+    /// @param _minRequiredCORELockedAmount Minimum required locked amount of native token
     function initialize(
         address _lockers,
-        uint _minRequiredTNTLockedAmount
+        uint _minRequiredCORELockedAmount
     ) public initializer {
 
         Ownable2StepUpgradeable.__Ownable2Step_init();
         UUPSUpgradeable.__UUPSUpgradeable_init();
 
         _setLockers(_lockers);
-        _addCollateral(NATIVE_TOKEN, _minRequiredTNTLockedAmount);
+        _addCollateral(NATIVE_TOKEN, _minRequiredCORELockedAmount);
     }
 
     function renounceOwnership() public virtual override onlyOwner {}
