@@ -300,7 +300,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /// @return                               True if candidate is added successfully
     function addLocker(
         address _lockerTargetAddress
-    ) external override nonZeroAddress(_lockerTargetAddress) nonReentrant onlyOwner returns (bool) {
+    ) external override nonReentrant onlyOwner nonZeroAddress(_lockerTargetAddress) returns (bool) {
         DataTypes.locker storage theLocker = lockersMapping[_lockerTargetAddress];
 
         require(
@@ -523,8 +523,8 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     function liquidateLocker(
         address _lockerTargetAddress,
         uint _collateralAmount
-    ) external override nonZeroAddress(_lockerTargetAddress) nonZeroValue(_collateralAmount)
-    nonReentrant whenNotPaused returns (bool) {
+    ) external override nonReentrant whenNotPaused
+    nonZeroAddress(_lockerTargetAddress) nonZeroValue(_collateralAmount) returns (bool) {
 
         uint neededCoreBTC = LockersLib.liquidateLocker(
             lockersMapping[_lockerTargetAddress],
@@ -579,8 +579,8 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     function buySlashedCollateralOfLocker(
         address _lockerTargetAddress,
         uint _collateralAmount
-    ) external nonZeroAddress(_lockerTargetAddress)
-        nonReentrant whenNotPaused override returns (bool) {
+    ) external override nonReentrant whenNotPaused
+        nonZeroAddress(_lockerTargetAddress) returns (bool) {
 
         uint neededCoreBTC = LockersLib.buySlashedCollateralOfLocker(
             lockersMapping[_lockerTargetAddress],
@@ -686,8 +686,8 @@ contract LockersLogic is LockersStorageStructure, ILockers,
         address _receiver,
         bytes32 _txId,
         uint _amount
-    ) external override nonZeroAddress(_receiver)
-    nonZeroValue(_amount) nonReentrant whenNotPaused onlyMinter returns (uint) {
+    ) external override nonReentrant whenNotPaused onlyMinter
+    nonZeroAddress(_receiver) nonZeroValue(_amount) returns (uint) {
 
         address _lockerTargetAddress = lockerTargetAddress[_lockerLockingScript];
 
