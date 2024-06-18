@@ -114,7 +114,7 @@ contract CollateralsLogic is ICollaterals, Ownable2StepUpgradeable, UUPSUpgradea
         _setLockers(_lockers);
     }
 
-    /// @notice                     Sets minmum required locked amount of collateral
+    /// @notice                     Sets minimum required locked amount of collateral
     /// @param _token               The address of collateral
     /// @param _minLockedAmount     The minimum required locked amount of collateral
     function setMinLockedAmount(
@@ -124,7 +124,7 @@ contract CollateralsLogic is ICollaterals, Ownable2StepUpgradeable, UUPSUpgradea
         _setMinLockedAmount(_token, _minLockedAmount);
     }
 
-    /// @notice                     Adds a collateral to avaliable list
+    /// @notice                     Adds a collateral to available list
     /// @param _token               The address of collateral
     /// @param _minLockedAmount     The minimum required locked amount of collateral
     function addCollateral(
@@ -134,7 +134,7 @@ contract CollateralsLogic is ICollaterals, Ownable2StepUpgradeable, UUPSUpgradea
         _addCollateral(_token, _minLockedAmount);
     }
 
-    /// @notice                     Removes a collateral from avaliable list
+    /// @notice                     Removes a collateral from available list
     /// @dev                        Only Lockers contract can call this
     /// @param _token               The address of collateral
     function removeCollateral(address _token) external override onlyOwner {
