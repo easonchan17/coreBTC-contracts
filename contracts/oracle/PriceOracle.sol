@@ -40,8 +40,16 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
 
     /// @notice                         This contract is used to get relative price of two assets from available oracles
     /// @param _acceptableDelay         Maximum acceptable delay for data given from Oracles
-    constructor(uint _acceptableDelay) {
+    /// @param _earnWrappedToken        The address of the earn wrapped token (STCORE) contract
+    /// @param _earnStrategy            The address of the earn strategy contract
+    constructor(
+        uint _acceptableDelay,
+        address _earnWrappedToken,
+        address _earnStrategy
+    ) {
         _setAcceptableDelay(_acceptableDelay);
+        _setEarnWrappedToken(_earnWrappedToken);
+        _setEarnStrategy(_earnStrategy);
     }
 
     function renounceOwnership() public virtual override onlyOwner {}
@@ -149,24 +157,16 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
         emit NewTokenPricePair(_token, oldPricePair, _pairName);
     }
 
-    function setEarnWrappedToken(address _earnWrappedToken) external override nonZeroAddress(_earnWrappedToken) onlyOwner {
-        require(
-            _earnWrappedToken != earnWrappedToken,
-            "PriceOracle: earn wrapped token unchanged"
-        );
-
-        emit NewEarnWrappedToken(earnWrappedToken, _earnWrappedToken);
-        earnWrappedToken = _earnWrappedToken;
+    /// @notice                     Sets the earn wrapped token (STCORE) contract address
+    /// @param _earnWrappedToken    The address of the earn wrapped token (STCORE) contract
+    function setEarnWrappedToken(address _earnWrappedToken) external override onlyOwner {
+        _setEarnWrappedToken(_earnWrappedToken);
     }
 
-    function setEarnStrategy(address _earnStrategy) external override nonZeroAddress(_earnStrategy) onlyOwner {
-        require(
-            _earnStrategy != earnStrategy,
-            "PriceOracle: earn strategy unchanged"
-        );
-
-        emit NewEarnStrategy(earnStrategy, _earnStrategy);
-        earnStrategy = _earnStrategy;
+    /// @notice                     Sets the earn strategy contract address
+    /// @param _earnStrategy        The address of the earn strategy contract
+    function setEarnStrategy(address _earnStrategy) external override onlyOwner {
+        _setEarnStrategy(_earnStrategy);
     }
 
     /// @notice                     Sets acceptable delay for oracle responses
@@ -187,6 +187,30 @@ contract PriceOracle is IPriceOracle, Ownable2Step, Pausable {
     /// @dev                        Only owner can pause
     function unPauseOracle() external override onlyOwner {
         _unpause();
+    }
+
+    /// @notice                     Internal setter for the earn wrapped token (STCORE) contract address
+    /// @param _earnWrappedToken    The address of the earn wrapped token (STCORE) contract
+    function _setEarnWrappedToken(address _earnWrappedToken) private nonZeroAddress(_earnWrappedToken) {
+        require(
+            _earnWrappedToken != earnWrappedToken,
+            "PriceOracle: earn wrapped token unchanged"
+        );
+
+        emit NewEarnWrappedToken(earnWrappedToken, _earnWrappedToken);
+        earnWrappedToken = _earnWrappedToken;
+    }
+
+    /// @notice                     Internal setter for the earn strategy contract address
+    /// @param _earnStrategy        The address of the earn strategy contract
+    function _setEarnStrategy(address _earnStrategy) private nonZeroAddress(_earnStrategy) {
+        require(
+            _earnStrategy != earnStrategy,
+            "PriceOracle: earn strategy unchanged"
+        );
+
+        emit NewEarnStrategy(earnStrategy, _earnStrategy);
+        earnStrategy = _earnStrategy;
     }
 
     /// @notice                     Internal setter for acceptable delay for oracle responses
