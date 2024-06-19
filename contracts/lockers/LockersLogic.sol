@@ -79,7 +79,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /**
      * @dev Give an account access to mint.
      */
-    function addMinter(address _account) external override nonZeroAddress(_account) onlyOwner {
+    function addMinter(address _account) external override onlyOwner {
         require(!isMinter(_account), "Lockers: account already has role");
         minters[_account] = true;
         emit MinterAdded(_account);
@@ -88,7 +88,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /**
      * @dev Remove an account's access to mint.
      */
-    function removeMinter(address _account) external override nonZeroAddress(_account) onlyOwner {
+    function removeMinter(address _account) external override onlyOwner {
         require(isMinter(_account), "Lockers: account does not have role");
         minters[_account] = false;
         emit MinterRemoved(_account);
@@ -102,7 +102,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /**
      * @dev Give an account access to burn.
      */
-    function addBurner(address _account) external override nonZeroAddress(_account) onlyOwner {
+    function addBurner(address _account) external override onlyOwner {
         require(!isBurner(_account), "Lockers: account already has role");
         burners[_account] = true;
         emit BurnerAdded(_account);
@@ -111,7 +111,7 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     /**
      * @dev Remove an account's access to burn.
      */
-    function removeBurner(address _account) external override nonZeroAddress(_account) onlyOwner {
+    function removeBurner(address _account) external override onlyOwner {
         require(isBurner(_account), "Lockers: account does not have role");
         burners[_account] = false;
         emit BurnerRemoved(_account);
@@ -542,12 +542,15 @@ contract LockersLogic is LockersStorageStructure, ILockers,
         IERC20(coreBTC).safeTransferFrom(msg.sender, address(this), neededCoreBTC);
 
         // Burns CoreBTC for locker rescue script
-        IERC20(coreBTC).approve(ccBurnRouter, neededCoreBTC);
-        IBurnRouter(ccBurnRouter).ccBurn(
-            neededCoreBTC,
-            theLiquidatingLocker.lockerRescueScript,
-            theLiquidatingLocker.lockerRescueType,
-            theLiquidatingLocker.lockerLockingScript
+        IERC20(coreBTC).safeApprove(ccBurnRouter, neededCoreBTC);
+        require(
+            IBurnRouter(ccBurnRouter).ccBurn(
+                neededCoreBTC,
+                theLiquidatingLocker.lockerRescueScript,
+                theLiquidatingLocker.lockerRescueType,
+                theLiquidatingLocker.lockerLockingScript
+            ) > 0,
+            "Lockers: burnt amount is zero"
         );
 
         _sendCollateralToRecipient(
