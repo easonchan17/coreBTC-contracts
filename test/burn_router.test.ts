@@ -523,6 +523,38 @@ describe("BurnRouter", async () => {
             ).to.equal(burntAmount);
 
         })
+        
+        it("Successfully performs CCBurn when locker burntAmount is 0", async function () {
+            let lastSubmittedHeight = 100;
+
+            // Gives allowance to burnRouter to burn tokens
+            await CoreBTCSigner1.approve(
+                burnRouter.address,
+                userRequestedAmount
+            );
+            // Sets mock contracts outputs
+            await setRelayLastSubmittedHeight(lastSubmittedHeight);
+            await setLockersIsLocker(true);
+            await setLockersBurnReturn(0);
+            await setLockersGetLockerTargetAddress();
+            await expect(
+                await burnRouterSigner1.ccBurn(
+                    userRequestedAmount,
+                    USER_SCRIPT_P2PKH,
+                    USER_SCRIPT_P2PKH_TYPE,
+                    LOCKER1_LOCKING_SCRIPT
+                )
+            ).to.emit(burnRouter, "CCBurn").withArgs(
+                signer1Address,
+                USER_SCRIPT_P2PKH,
+                USER_SCRIPT_P2PKH_TYPE,
+                userRequestedAmount,
+                0,
+                ONE_ADDRESS,
+                0,
+                lastSubmittedHeight + TRANSFER_DEADLINE
+            );
+        })
         it("Reverts since requested amount doesn't cover Bitcoin fee", async function () {
             let lastSubmittedHeight = 100;
 
@@ -1659,7 +1691,7 @@ describe("BurnRouter", async () => {
             ).to.equal(100);
         })
 
-        it("Reverts on setting transfer deadline without permit", async function () {
+        it("Successfully changes transfer deadline without permit", async function () {
             await mockBitcoinRelay.mock.finalizationParameter.returns(10);
             await expect(
                 burnRouter.setTransferDeadline(100)
@@ -1668,6 +1700,16 @@ describe("BurnRouter", async () => {
             await mockBitcoinRelay.mock.finalizationParameter.returns(210);
             await expect(
                 burnRouter.connect(signer2).setTransferDeadline(211)
+            ).to.emit(burnRouter, "NewTransferDeadline");
+        })
+
+        it("Requires permit to change transfer deadline", async function () {
+            await mockBitcoinRelay.mock.finalizationParameter.returns(10);
+            await expect(burnRouter.connect(signer2).setTransferDeadline(100)).to.revertedWith('BurnRouter: no permit');
+            await burnRouter.setTransferDeadline(100);
+            await mockBitcoinRelay.mock.finalizationParameter.returns(101);
+            await expect(
+                burnRouter.connect(signer2).setTransferDeadline(102)
             ).to.emit(burnRouter, "NewTransferDeadline");
         })
 
@@ -1770,11 +1812,11 @@ describe("BurnRouter", async () => {
             expect(
                 await burnRouter.treasury()
             ).to.equal(ONE_ADDRESS);
-             await expect(
+            await expect(
                 burnRouter.setSlasher(ONE_ADDRESS)
-            ).to.emit(burnRouter,'NewSlasher')
-                 .withArgs(ZERO_ADDRESS, ONE_ADDRESS);
-              expect(
+            ).to.emit(burnRouter, 'NewSlasher')
+                .withArgs(ZERO_ADDRESS, ONE_ADDRESS);
+            expect(
                 await burnRouter.slasher()
             ).to.equal(ONE_ADDRESS);
 
@@ -1814,7 +1856,7 @@ describe("BurnRouter", async () => {
             await expect(
                 burnRouterSigner2.setTreasury(ONE_ADDRESS)
             ).to.revertedWith("Ownable: caller is not the owner");
-             await expect(
+            await expect(
                 burnRouterSigner2.setSlasher(ONE_ADDRESS)
             ).to.revertedWith("Ownable: caller is not the owner");
         })

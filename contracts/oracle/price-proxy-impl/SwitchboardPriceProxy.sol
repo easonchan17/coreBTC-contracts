@@ -12,6 +12,7 @@ contract SwitchboardPriceProxy is AbstractPriceProxy {
 
     // Constants
     uint32 public constant SWITCHBOARD_VALUE_DECIMALS = 18;
+    string public constant USDT_PRICE_PAIR_NAME = "USDT/USDT";
 
     constructor(address _oracle) AbstractPriceProxy(_oracle) {
     }
@@ -33,6 +34,12 @@ contract SwitchboardPriceProxy is AbstractPriceProxy {
     function _getEmaPriceByPairName(
         string memory _pairName
     ) internal view override returns(Price memory price, string memory err) {
+        if (Strings.equal(_pairName, USDT_PRICE_PAIR_NAME)) {
+            price.price = 1;
+            price.publishTime = block.timestamp;
+            return (price, err);
+        }
+
         // use latest price
         return _getLatestPriceByFeedId(_getFeedId(_pairName));
     }
@@ -54,9 +61,9 @@ contract SwitchboardPriceProxy is AbstractPriceProxy {
             price.publishTime = result.updatedAt;
 
         } catch Error(string memory _err) {
-            err = _formatStringErr(_err);
+            err = _err;
         } catch(bytes memory _err) {
-            err = _formatBytesErr(_err);
+            err = bytesToHex(_err);
         }
     }
 
