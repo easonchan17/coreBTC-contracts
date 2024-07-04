@@ -7,35 +7,35 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
 
-    const lockersLib = await deploy("LockersLib", {
+    const burnRouterLib = await deploy("BurnRouterLib", {
         from: deployer,
         log: true,
         skipIfAlreadyDeployed: true,
     })
 
-    const deployedContract = await deploy("LockersLogic", {
+    const deployedContract = await deploy("BurnRouterLogic", {
         from: deployer,
         log: true,
         skipIfAlreadyDeployed: true,
         libraries: {
-            "LockersLib": lockersLib.address
+            "BurnRouterLib": burnRouterLib.address
         },
     });
 
     if (network.name != "hardhat" && process.env.ETHERSCAN_API_KEY && process.env.VERIFY_OPTION == "1") {
         await verify(
-            lockersLib.address,
+            burnRouterLib.address,
             [],
-            "contracts/libraries/LockersLib.sol:LockersLib"
+            "contracts/libraries/BurnRouterLib.sol:BurnRouterLib"
         )
 
         await verify(
             deployedContract.address,
             [],
-            "contracts/lockers/LockersLogic.sol:LockersLogic"
+            "contracts/routers/BurnRouterLogic.sol:BurnRouterLogic"
         )
     }
 };
 
 export default func;
-func.tags = ["LockersLogic"];
+func.tags = ["BurnRouterLogic"];

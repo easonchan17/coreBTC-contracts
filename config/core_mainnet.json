@@ -1,0 +1,76 @@
+{
+  "bitcoin_light_client": "0x0000000000000000000000000000000000001003",
+  "starting_block_height": 836336,
+  "finalization_parameter": 3,
+  "chain_id": 1116,
+  "treasury": "0x75525d525488ecC19F9638454ba4f5b8D031Df7e",
+  "oracle": {
+    "acceptable_delay": 150,
+    "native_token": "0x0000000000000000000000000000000000000001",
+    "usdt_token": "0x",
+    "usdc_token": "0x",
+    "lst": {
+      "earn": "0xf5fA1728bABc3f8D2a617397faC2696c958C3409",
+      "stcore": "0xb3A8F0f0da9ffC65318aA39E55079796093029AD"
+    },
+    "price_pairs": {
+        "btc_usdt":"BTC/USDT",
+        "core_usdt":"CORE/USDT",
+        "usdt_usdt":"",
+        "usdc_usdt":""
+    },
+    "pyth": {
+      "address": "0xA2aa501b19aff244D90cc15a4Cf739D2725B5729",
+      "feed_ids": {
+        "btc_usdt": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+        "core_usdt": "0x9b4503710cc8c53f75c30e6e4fda1a7064680ef2e0ee97acd2e3a7c37b3c830c",
+        "usdt_usdt": "0x",
+        "usdc_usdt": "0x"
+      }
+    },
+    "switch_board": {
+      "address": "0xC29aAabf235c1E71633fb7365E95772B97F425d7"
+    }
+  },
+  "minter": {
+    "version": 1,
+    "app_id": 1,
+    "protocol_percentage_fee": 0
+  },
+  "burner": {
+    "protocol_percentage_fee": 0,
+    "slasher_percentage_reward": 500,
+    "bitcoin_fee": 15000,
+    "transfer_deadLine": 720,
+    "slasher": "0x8c6Abc256ea83D3151D8cBCe1B694f206408171D"
+  },
+  "locker": {
+    "min_locked_native_token_amount": 100000,
+    "collateral_ratio": 15000,
+    "liquidation_ratio": 13000,
+    "locker_percentage_fee": 15,
+    "price_with_discount_ratio": 9000,
+    "slash_compensation_ratio": 200
+  },
+  "core_btc": {
+    "token_name": "Core Wrapped BTC Token",
+    "token_symbol": "COREBTC"
+  },
+  "ownerships": {
+    "default": "0x75525d525488ecC19F9638454ba4f5b8D031Df7e",
+    "contracts": [
+      "BitcoinRelayProxy",
+      "CoreBTCProxy",
+      "CcTransferRouterProxy",
+      "BurnRouterProxy",
+      "LockersProxy",
+      "CollateralsProxy",
+      "PythPriceProxy",
+      "SwitchboardPriceProxy",
+      "PriceOracle"
+    ]
+  },
+  "features": {
+    "enable_multiple_collaterals": true
+  }
+}

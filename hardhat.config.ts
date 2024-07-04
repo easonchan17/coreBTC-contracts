@@ -15,8 +15,25 @@ import "hardhat-contract-sizer";
 
 dotenv.config();
 
+function toggleSensitiveInfo(text:any, visibleChars:number = 4) {
+	if (!text || text.length <= visibleChars * 2) return "*";
+
+	const hiddenPart = '*'.repeat(text.length - visibleChars * 2);
+	return text.slice(0, 4) + hiddenPart + text.slice(-4);
+}
+
+const {PRIVATE_KEY,ETHERSCAN_API_KEY,NETNAME,NETWORK} = process.env;
+console.log(`PRIVATE_KEY=${toggleSensitiveInfo(PRIVATE_KEY)}`);
+console.log(`ETHERSCAN_API_KEY=${toggleSensitiveInfo(ETHERSCAN_API_KEY)}`);
+console.log(`NETWORK=${NETWORK}`);
+
+if (NETWORK !== NETNAME) {
+	console.log('NETWORK !== NETNAME');
+	process.exit(1);
+}
+
 const infuraNetwork = (
-	accounts: any, 
+	accounts: any,
 	network: string,
 	chainId?: number,
 	gas?: number
@@ -44,14 +61,14 @@ const config: HardhatUserConfig = {
 		],
 	},
 	networks: {
-		mumbai: {
-			url: "https://rpc-mumbai.maticvigil.com",
-			chainId: 80001,
-			accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-		},
 		core_devnet: {
 			url: "https://rpc.dev.btcs.network/",
 			chainId: 1112,
+			accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+		},
+		core_testnet_for_dev: {
+			url: "https://rpc.test.btcs.network/",
+			chainId: 1115,
 			accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
 		},
 		core_testnet: {
@@ -62,21 +79,9 @@ const config: HardhatUserConfig = {
 		core_mainnet: {
 			url: "https://rpc.coredao.org/",
 			chainId: 1116,
-			gasPrice: 30000000000,
 			accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
 		}
-		// bsc: {
-		// 	url: "https://bsc-dataseed.binance.org/",
-		// 	chainId: 56,
-		// 	gasPrice: 20000000000,
-		// 	accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-		// },
-		// bsc_testnet: {
-		// 	url: "https://bsc-testnet.publicnode.com",
-		// 	chainId: 97,
-		// 	accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-		// },
-	},	
+	},
   	paths: {
 		artifacts: "artifacts",
 		deploy: "deploy",
@@ -105,6 +110,14 @@ const config: HardhatUserConfig = {
 				urls: {
 					apiURL: "http://18.221.10.178:8090/api",
 					browserURL: "https://scan.dev.btcs.network/"
+				}
+			},
+			{
+				network: "core_testnet_for_dev",
+				chainId: 1115,
+				urls: {
+					apiURL: "https://api.test.btcs.network/api",
+					browserURL: "https://scan.test.btcs.network/"
 				}
 			},
 			{

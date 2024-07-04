@@ -1,0 +1,76 @@
+{
+  "bitcoin_light_client": "0x0000000000000000000000000000000000001003",
+  "starting_block_height": 827414,
+  "finalization_parameter": 2,
+  "chain_id": 1115,
+  "treasury": "0x121801f569db7691d75C3BD422B4C8e7544FBD24",
+  "oracle": {
+    "acceptable_delay": 150,
+    "native_token": "0x0000000000000000000000000000000000000001",
+    "usdt_token": "0x",
+    "usdc_token": "0x",
+    "lst": {
+      "earn": "0xC2b71E7572476A0Db1939FAdd755d3dFE6b96374",
+      "stcore": "0x48C55da8E7D2107CcD8386233090b21f42A58bEB"
+    },
+    "price_pairs": {
+        "btc_usdt":"BTC/USDT",
+        "core_usdt":"CORE/USDT",
+        "usdt_usdt":"USDT/USDT",
+        "usdc_usdt":"USDC/USDT"
+    },
+    "pyth": {
+      "address": "0x8D254a21b3C86D32F7179855531CE99164721933",
+      "feed_ids": {
+        "btc_usdt": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+        "core_usdt": "0x9b4503710cc8c53f75c30e6e4fda1a7064680ef2e0ee97acd2e3a7c37b3c830c",
+        "usdt_usdt": "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
+        "usdc_usdt": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+      }
+    },
+    "switch_board": {
+      "address": "0x4D06F949eb1057EB86446532eDf1cF323e787a8f"
+    }
+  },
+  "minter": {
+    "version": 1,
+    "app_id": 1,
+    "protocol_percentage_fee": 5
+  },
+  "burner": {
+    "protocol_percentage_fee": 5,
+    "slasher_percentage_reward": 500,
+    "bitcoin_fee": 15000,
+    "transfer_deadLine": 5,
+    "slasher": "0xc56C83c247F995051Ca050557fC1F34e5f950f11"
+  },
+  "locker": {
+    "min_locked_native_token_amount": 1,
+    "collateral_ratio": 20000,
+    "liquidation_ratio": 15000,
+    "locker_percentage_fee": 15,
+    "price_with_discount_ratio": 9000,
+    "slash_compensation_ratio": 0
+  },
+  "core_btc": {
+    "token_name": "Core Wrapped BTC Token",
+    "token_symbol": "COREBTC"
+  },
+  "ownerships": {
+    "default": "0xc56C83c247F995051Ca050557fC1F34e5f950f11",
+    "contracts": [
+      "BitcoinRelayProxy",
+      "CoreBTCProxy",
+      "LockersProxy",
+      "CcTransferRouterProxy",
+      "BurnRouterProxy",
+      "CollateralsProxy",
+      "PythPriceProxy",
+      "SwitchboardPriceProxy",
+      "PriceOracle"
+    ]
+  },
+  "features": {
+    "enable_multiple_collaterals": true
+  }
+}

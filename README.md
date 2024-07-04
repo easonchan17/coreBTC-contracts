@@ -41,8 +41,4 @@ You can deploy contracts on supported networks (testnet or mainnet) with the fol
 
 After deployment, some variables need to be set using the following commands:
 
-`NETWORK= yarn init_config`
-
-Run the below command with a different private key to config upgradable contracts:
-
-`NETWORK= yarn config_upgradables`
+`NETWORK= yarn set_contracts`

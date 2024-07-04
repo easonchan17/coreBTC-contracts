@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
+import config from 'config'
 import {verify} from "../helper-functions"
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -7,35 +8,24 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
 
-    const lockersLib = await deploy("LockersLib", {
-        from: deployer,
-        log: true,
-        skipIfAlreadyDeployed: true,
-    })
+    const switchboardAddress = config.get("oracle.switch_board.address");
 
-    const deployedContract = await deploy("LockersLogic", {
+    const deployedContract = await deploy("SwitchboardPriceProxy", {
         from: deployer,
         log: true,
         skipIfAlreadyDeployed: true,
-        libraries: {
-            "LockersLib": lockersLib.address
-        },
+        args: [
+            switchboardAddress
+        ],
     });
 
     if (network.name != "hardhat" && process.env.ETHERSCAN_API_KEY && process.env.VERIFY_OPTION == "1") {
         await verify(
-            lockersLib.address,
-            [],
-            "contracts/libraries/LockersLib.sol:LockersLib"
-        )
-
-        await verify(
-            deployedContract.address,
-            [],
-            "contracts/lockers/LockersLogic.sol:LockersLogic"
-        )
+            deployedContract.address, 
+            [switchboardAddress], 
+            "contracts/oracle/price-proxy-impl/SwitchboardPriceProxy.sol:SwitchboardPriceProxy")
     }
 };
 
 export default func;
-func.tags = ["LockersLogic"];
+func.tags = ["SwitchboardPriceProxy"];

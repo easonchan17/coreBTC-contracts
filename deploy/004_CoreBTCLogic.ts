@@ -1,5 +1,5 @@
-import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {DeployFunction} from 'hardhat-deploy/types';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DeployFunction } from 'hardhat-deploy/types';
 import {verify} from "../helper-functions"
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
 
-    const deployedContract = await deploy("CcTransferRouterLogic", {
+    const deployedContract = await deploy("CoreBTCLogic", {
         from: deployer,
         log: true,
         skipIfAlreadyDeployed: true
@@ -17,10 +17,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         await verify(
             deployedContract.address, 
             [], 
-            "contracts/routers/CcTransferRouterLogic.sol:CcTransferRouterLogic"
+            "contracts/erc20/CoreBTCLogic.sol:CoreBTCLogic"
         )
     }
 };
 
 export default func;
-func.tags = ["CcTransferRouterLogic"];
+func.tags = ["CoreBTCLogic"];

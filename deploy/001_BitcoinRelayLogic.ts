@@ -1,5 +1,5 @@
-import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import {DeployFunction} from 'hardhat-deploy/types';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DeployFunction } from 'hardhat-deploy/types';
 import {verify} from "../helper-functions"
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
 
-    const deployedContract = await deploy("CcTransferRouterLogic", {
+    const deployedContract = await deploy("BitcoinRelayLogic", {
         from: deployer,
         log: true,
         skipIfAlreadyDeployed: true
@@ -15,12 +15,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     if (network.name != "hardhat" && process.env.ETHERSCAN_API_KEY && process.env.VERIFY_OPTION == "1") {
         await verify(
-            deployedContract.address, 
-            [], 
-            "contracts/routers/CcTransferRouterLogic.sol:CcTransferRouterLogic"
-        )
+            deployedContract.address,
+            [],
+            "contracts/common/relay/BitcoinRelayLogic.sol:BitcoinRelayLogic")
     }
 };
 
 export default func;
-func.tags = ["CcTransferRouterLogic"];
+func.tags = ["BitcoinRelayLogic"];
