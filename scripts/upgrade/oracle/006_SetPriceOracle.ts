@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import config from 'config'
 import { ethers } from 'hardhat';
 import { assert } from 'console';
-import { checkComponentAddress, getContractInst, isEnableMultipleCollaterals } from '../../../helper-functions';
+import { checkComponentAddress, getContractInst, isEnableMockPriceProxy, isEnableMultipleCollaterals } from '../../../helper-functions';
 const logger = require('node-color-log');
 
 async function addTokenPricePair(priceOracleInst: any, tokenAddr: any, pairName: any) {
@@ -147,15 +147,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const coreBTCProxyAddress = await checkComponentAddress(deployments, "CoreBTCProxy");
     if (!ethers.utils.isAddress(coreBTCProxyAddress)) return;
 
-    const switchboardPriceProxyAddress = await checkComponentAddress(deployments, "SwitchboardPriceProxy");
-    if (!ethers.utils.isAddress(switchboardPriceProxyAddress)) return;
-
-    const pythPriceProxyInst = await getContractInst(deployments, "", "PythPriceProxy", "");
-    if (!pythPriceProxyInst) return;
-
-    const pythPriceProxyAddress = pythPriceProxyInst.address;
-    if (!ethers.utils.isAddress(pythPriceProxyAddress)) return;
-
     const priceOracleInst = await getContractInst(deployments, "", "PriceOracle", "");
     if (!priceOracleInst) return;
 
@@ -219,7 +210,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         }
     }
 
+    if (isEnableMockPriceProxy()) return;
+
     // init PriceOracle: add priceProxies
+    const switchboardPriceProxyAddress = await checkComponentAddress(deployments, "SwitchboardPriceProxy");
+    if (!ethers.utils.isAddress(switchboardPriceProxyAddress)) return;
+
+    const pythPriceProxyInst = await getContractInst(deployments, "", "PythPriceProxy", "");
+    if (!pythPriceProxyInst) return;
+
+    const pythPriceProxyAddress = pythPriceProxyInst.address;
+    if (!ethers.utils.isAddress(pythPriceProxyAddress)) return;
+
     logger.color('blue').log("-------------------------------------------------");
     logger.color('blue').bold().log("Add PythPriceProxy in PriceOracle ...");
     let idx = await priceOracleInst.priceProxyIdxMap(pythPriceProxyAddress);

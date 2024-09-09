@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
-import { getContractInst, isEnableMultipleCollaterals } from '../../../helper-functions';
+import { getContractInst, isEnableMockPriceProxy, isEnableMultipleCollaterals } from '../../../helper-functions';
 import { ethers } from 'hardhat';
 import { assert } from 'console';
 const logger = require('node-color-log');
@@ -47,11 +47,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const burnRouterProxyInst = await getContractInst(deployments, "BurnRouterProxy", "BurnRouterLogic", "BurnRouterLib");
     addInstToMap("BurnRouterProxy", burnRouterProxyInst, defaultOwner);
 
-    const pythInst = await getContractInst(deployments, "", "PythPriceProxy", "");
-    addInstToMap("PythPriceProxy", pythInst, defaultOwner);
+    if (!isEnableMockPriceProxy()) {
+        const pythInst = await getContractInst(deployments, "", "PythPriceProxy", "");
+        addInstToMap("PythPriceProxy", pythInst, defaultOwner);
 
-    const switchboardInst = await getContractInst(deployments, "", "SwitchboardPriceProxy", "");
-    addInstToMap("SwitchboardPriceProxy", switchboardInst, defaultOwner);
+        const switchboardInst = await getContractInst(deployments, "", "SwitchboardPriceProxy", "");
+        addInstToMap("SwitchboardPriceProxy", switchboardInst, defaultOwner);
+    }
 
     const priceOracleInst = await getContractInst(deployments, "", "PriceOracle", "");
     addInstToMap("PriceOracle", priceOracleInst, defaultOwner);

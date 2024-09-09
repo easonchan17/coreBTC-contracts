@@ -134,6 +134,16 @@ function isEnableMultipleCollaterals() {
   return enableMultipleCollaterals as boolean;
 }
 
+function isEnableMockPriceProxy() {
+  try {
+    const enableMockPriceProxy = config.get("features.enable_mock_price_proxy");
+    return enableMockPriceProxy as boolean;
+  } catch (error) {
+    return false;
+  }
+
+}
+
 async function getContractInst(component: any, proxyName: any, logicName: any, libName: any) {
   let libraries:{[key:string]: string} = {};
   if (libName && libName.length > 0) {
@@ -169,6 +179,7 @@ export {
   verify,
   checkComponentAddress,
   isEnableMultipleCollaterals,
+  isEnableMockPriceProxy,
   getContractInst,
   checkValue
 }

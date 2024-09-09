@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/types';
 import config from 'config'
 import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
-import { checkComponentAddress, getContractInst, isEnableMultipleCollaterals } from '../../../helper-functions';
+import { checkComponentAddress, getContractInst, isEnableMockPriceProxy, isEnableMultipleCollaterals } from '../../../helper-functions';
 const logger = require('node-color-log');
 
 
@@ -14,12 +14,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     const coreBTCProxyAddress = await checkComponentAddress(deployments, "CoreBTCProxy");
     if (!ethers.utils.isAddress(coreBTCProxyAddress as string)) return;
-
-    const pythPriceProxyInst = await getContractInst(deployments, "", "PythPriceProxy", "");
-    if (!pythPriceProxyInst) return;
-
-    const switchboardPriceProxyInst = await getContractInst(deployments, "", "SwitchboardPriceProxy", "");
-    if (!switchboardPriceProxyInst) return;
 
     const priceOracleInst = await getContractInst(deployments, "", "PriceOracle", "");
     if (!priceOracleInst) return;
@@ -52,38 +46,48 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         // pairNameMap["USDC"] = usdcPricePair;
     }
 
-    let price: any, err: string;
+    if (!isEnableMockPriceProxy()) {
+        let price: any, err: string;
 
-    logger.color('blue').log("-------------------------------------------------");
-    logger.color('blue').bold().log("PythPriceProxy state checking...");
-    for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
-        const feedId = await pythPriceProxyInst.getFeedId(pairName);
-        console.log(`${tokenName} price pair name is ${pairName}, feedId = ${feedId}`);
-    }
+        logger.color('blue').log("-------------------------------------------------");
+        logger.color('blue').bold().log("PythPriceProxy state checking...");
 
-    for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
-        [price, err] = await pythPriceProxyInst.getEmaPriceByPairName(pairName);
-        console.log(tokenName, pairName, "Pyth EMA Price =", {
-            price: price.price,
-            decimals: price.decimals,
-            publishTime: price.publishTime,
-            err: err
-        });
-    }
+        const pythPriceProxyInst = await getContractInst(deployments, "", "PythPriceProxy", "");
+        if (!pythPriceProxyInst) return;
 
-    /// SwitchboardPriceProxy init state
-    //  1.CORE price
-    //  2.BTC price
-    logger.color('blue').log("-------------------------------------------------");
-    logger.color('blue').bold().log("SwitchboardPriceProxy state checking...");
-    for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
-        [price, err] = await switchboardPriceProxyInst.getEmaPriceByPairName(pairName);
-        console.log(tokenName, pairName, "Switchboard EMA Price =", {
-            price: price.price,
-            decimals: price.decimals,
-            publishTime: price.publishTime,
-            err: err
-        });
+        for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
+            const feedId = await pythPriceProxyInst.getFeedId(pairName);
+            console.log(`${tokenName} price pair name is ${pairName}, feedId = ${feedId}`);
+        }
+
+        for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
+            [price, err] = await pythPriceProxyInst.getEmaPriceByPairName(pairName);
+            console.log(tokenName, pairName, "Pyth EMA Price =", {
+                price: price.price,
+                decimals: price.decimals,
+                publishTime: price.publishTime,
+                err: err
+            });
+        }
+
+        /// SwitchboardPriceProxy init state
+        //  1.CORE price
+        //  2.BTC price
+        logger.color('blue').log("-------------------------------------------------");
+        logger.color('blue').bold().log("SwitchboardPriceProxy state checking...");
+
+        const switchboardPriceProxyInst = await getContractInst(deployments, "", "SwitchboardPriceProxy", "");
+        if (!switchboardPriceProxyInst) return;
+
+        for (const [tokenName, pairName] of Object.entries(pairNameMap)) {
+            [price, err] = await switchboardPriceProxyInst.getEmaPriceByPairName(pairName);
+            console.log(tokenName, pairName, "Switchboard EMA Price =", {
+                price: price.price,
+                decimals: price.decimals,
+                publishTime: price.publishTime,
+                err: err
+            });
+        }
     }
 
     /// PriceOracle init state:
@@ -115,10 +119,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         console.log(`The pair name of token ${tokenName} is ${pairName}`);
     }
 
-    for (let i = 0; i < 2; i++) {
-        const priceProxy = await priceOracleInst.priceProxyList(i);
-        console.log(`PriceOracle priceProxy ${i} is ${priceProxy}`);
+    try {
+        for (let i = 0; i < 2; i++) {
+            const priceProxy = await priceOracleInst.priceProxyList(i);
+            console.log(`PriceOracle priceProxy ${i} is ${priceProxy}`);
+        }
+    } catch (error) {
+
     }
+
     const bestProxy   = await priceOracleInst.bestPriceProxy();
     console.log("PriceOracle best priceProxy is", bestProxy);
 
@@ -183,6 +192,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             }
             console.log(`PriceOracle, ${inputAmount} ${param.inputTokenName} = ${res.toNumber()} ${param.outputTokenName}`);
         } catch (e: any) {
+            console.log(`Call equivalentOutputAmount error: inputTokenName=${param.inputTokenName}, outputTokenName=${param.outputTokenName}`)
             console.log(e.message)
         }
     }

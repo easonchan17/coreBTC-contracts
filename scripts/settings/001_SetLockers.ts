@@ -34,23 +34,23 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         console.log("slash compensation ratio is already setted");
     }
 
-    if (isEnableMultipleCollaterals()) {
-        logger.color('blue').log("-----------------------------------------");
-        logger.color('blue').bold().log("Set collaterals in lockers ...");
+    // if (isEnableMultipleCollaterals()) {
+    //     logger.color('blue').log("-----------------------------------------");
+    //     logger.color('blue').bold().log("Set collaterals in lockers ...");
 
-        const newCollateralsAddress = await waitForInput("Enter collaterals proxy Address:");
-        assert(ethers.utils.isAddress(newCollateralsAddress as string), "collaterals proxy address is invalid!");
-        if (!ethers.utils.isAddress(newCollateralsAddress as string)) return;
+    //     const newCollateralsAddress = await waitForInput("Enter collaterals proxy Address:");
+    //     assert(ethers.utils.isAddress(newCollateralsAddress as string), "collaterals proxy address is invalid!");
+    //     if (!ethers.utils.isAddress(newCollateralsAddress as string)) return;
 
-        const oldCollateralsAddress = await lockersProxyInst.collaterals();
-        if (oldCollateralsAddress != newCollateralsAddress) {
-            const tx = await lockersProxyInst.setCollaterals(newCollateralsAddress);
-            await tx.wait(1);
-            console.log("Setted collaterals in lockersProxy: ", tx.hash);
-        } else {
-            console.log("collaterals is already setted");
-        }
-    }
+    //     const oldCollateralsAddress = await lockersProxyInst.collaterals();
+    //     if (oldCollateralsAddress != newCollateralsAddress) {
+    //         const tx = await lockersProxyInst.setCollaterals(newCollateralsAddress);
+    //         await tx.wait(1);
+    //         console.log("Setted collaterals in lockersProxy: ", tx.hash);
+    //     } else {
+    //         console.log("collaterals is already setted");
+    //     }
+    // }
 
     logger.color('blue').log("-----------------------------------------");
     logger.color('blue').bold().log("Set ccBurnRouter in lockers ...");

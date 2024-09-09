@@ -1,7 +1,8 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
-import { verify,waitForInput } from '../../../helper-functions';
+import { checkComponentAddress, verify,waitForInput } from '../../../helper-functions';
 import { BigNumber } from 'ethers';
+import { ethers } from 'hardhat';
 const logger = require('node-color-log');
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -12,7 +13,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     logger.color('blue').log("-----------------------------------------");
     logger.color('blue').bold().log("Deploy MockPriceProxy Contract ...");
 
-    const oracleAddress:string = await waitForInput("Enter Oracle Address:") as string;
+    // Use a fake oracle address for deploying mock price proxy, the oracle address will not be used.
+    const oracleAddress = await checkComponentAddress(deployments, "PriceOracle");
+    if (!ethers.utils.isAddress(oracleAddress)) return;
 
     const args = [
         oracleAddress
@@ -35,4 +38,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["erc20"];
+func.tags = ["MockPriceProxy"];
