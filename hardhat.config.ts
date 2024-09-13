@@ -64,6 +64,7 @@ const config: HardhatUserConfig = {
 		core_devnet: {
 			url: "https://rpc.dev.btcs.network/",
 			chainId: 1112,
+			gasPrice: 35000000000,
 			accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
 		},
 		core_testnet_for_dev: {

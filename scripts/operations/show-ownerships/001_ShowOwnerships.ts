@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployFunction } from 'hardhat-deploy/types';
-import { getContractInst, isEnableMultipleCollaterals } from '../../../helper-functions';
+import { getContractInst, isEnableMockPriceProxy, isEnableMultipleCollaterals } from '../../../helper-functions';
 import { ethers } from 'hardhat';
 import { assert } from 'console';
 const logger = require('node-color-log');
@@ -26,9 +26,16 @@ async function initContractInstMap(deployments:any) {
     await addContractInstMap("LockersProxy", "LockersLogic", "LockersLib");
     await addContractInstMap("CcTransferRouterProxy", "CcTransferRouterLogic", "");
     await addContractInstMap("BurnRouterProxy", "BurnRouterLogic", "BurnRouterLib");
-    await addContractInstMap("", "PythPriceProxy", "");
-    await addContractInstMap("", "SwitchboardPriceProxy", "");
+
+    if (isEnableMockPriceProxy()) {
+        await addContractInstMap("", "MockPriceProxy", "");
+    } else {
+        await addContractInstMap("", "PythPriceProxy", "");
+        await addContractInstMap("", "SwitchboardPriceProxy", "");
+    }
+
     await addContractInstMap("", "PriceOracle", "");
+
     if (isEnableMultipleCollaterals()) {
         await addContractInstMap("CollateralsProxy", "CollateralsLogic", "");
     }
