@@ -176,6 +176,12 @@ interface ILockers is ILockersStorage {
         address newCollaterals
     );
 
+    event Reclaim(
+        address receiver,
+        uint256 amount,
+        uint256 balance
+    );
+
     // Read-only functions
 
     function getLockerTargetAddress(bytes calldata _lockerLockingScript) external view returns (address);
@@ -274,6 +280,8 @@ interface ILockers is ILockersStorage {
     function requestActivation() external returns (bool);
 
     function selfRemoveLocker() external returns (bool);
+
+    function reclaim(uint256 _amount) external;
 
     function slashIdleLocker(
         address _lockerTargetAddress,

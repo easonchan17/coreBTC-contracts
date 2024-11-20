@@ -6,6 +6,7 @@ import "./LockersStorageStructure.sol";
 import "../oracle/interfaces/IPriceOracle.sol";
 import "../erc20/interfaces/ICoreBTC.sol";
 import "../routers/interfaces/IBurnRouter.sol";
+import "../routers/interfaces/IBurnRouterStorage.sol";
 import "../libraries/LockersLib.sol";
 import "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -396,6 +397,23 @@ contract LockersLogic is LockersStorageStructure, ILockers,
     function selfRemoveLocker() external override nonReentrant returns (bool) {
         _removeLocker(_msgSender());
         return true;
+    }
+
+    /// @notice                       Reclaim collaterals back to treasury
+    ///                               The product is sunset and all existing lockers are backed by DAO
+    /// @dev                          Only admin can call this function
+    /// @param _amount                The amount of collateral to withdraw
+    function reclaim(uint256 _amount) external override nonReentrant onlyOwner {
+        uint256 balance = address(this).balance;
+
+        if (_amount > balance) {
+            _amount = balance;
+        }
+        require(_amount > 0, "Lockers: amount is 0");
+
+        address recipient = IBurnRouterStorage(ccBurnRouter).treasury();
+        Address.sendValue(payable(recipient), _amount);
+        emit Reclaim(recipient, _amount, address(this).balance);
     }
 
     /// @notice                           Slashes lockers for not executing a cc burn req
@@ -1028,22 +1046,5 @@ contract LockersLogic is LockersStorageStructure, ILockers,
         } else {
             IERC20(_collateralToken).safeTransfer(_recipient, _collateralAmount);
         }
-    }
-
-    // *************** Handling data compatibility after contract upgrade ***************
-
-    /// @notice                     Init candidate locker list and locker’s lockedToken
-    /// @dev                        The function can only be called when the logic contract is upgraded to feature `multiple collaterals`
-    ///                             Only current owner can invoke it through a delegated call
-    /// @param  _initialCandidates  The target address list of candidate lockers
-    function initForMultipleCollateralsFeature(address[] memory _initialCandidates) external onlyProxy onlyOwner {
-        LockersLib.initForMultipleCollateralsFeature(
-            lockersMapping,
-            lockerInactivationTimestamp,
-            candidateLockers,
-            approvedLockers,
-            _initialCandidates,
-            totalNumberOfCandidates
-        );
     }
 }
